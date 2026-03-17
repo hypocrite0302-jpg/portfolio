@@ -1,0 +1,153 @@
+/* ... Previous styles ... */
+
+/* Uplink Array (Socials) */
+.uplink-array {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    z-index: 1500;
+}
+
+.uplink-header {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--primary-color);
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.uplink-header:hover {
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+.pulse-green {
+    width: 6px;
+    height: 6px;
+    background: #00ff41;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+.uplink-menu {
+    position: absolute;
+    bottom: 110%; /* Above the header */
+    right: 0;
+    width: 250px;
+    background: rgba(5, 5, 5, 0.95);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 5px 0;
+    backdrop-filter: blur(10px);
+    transform-origin: bottom right;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.uplink-menu.hidden {
+    transform: scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.uplink-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+}
+
+.uplink-item:hover {
+    background: rgba(0, 243, 255, 0.1);
+}
+
+.uplink-label { color: var(--primary-color); font-weight: bold; }
+.uplink-status { color: var(--dim-text); }
+
+/* Secure Channel (Hook) */
+.secure-channel-container {
+    max-width: 1000px;
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid var(--primary-color);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 60px 40px;
+    position: relative;
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    .secure-channel-container {
+        padding: 40px 20px;
+    }
+    
+    .uplink-array {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .uplink-menu {
+        width: 200px;
+    }
+}
+
+.secure-channel-container::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 20px;
+    height: 20px;
+    border-top: 2px solid var(--primary-color);
+    border-left: 2px solid var(--primary-color);
+}
+
+.channel-status {
+    color: var(--dim-text);
+    margin-bottom: 30px;
+    font-family: var(--font-mono);
+    line-height: 1.5;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-family: var(--font-mono);
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+}
+
+.input-group textarea, .input-group input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.input-group textarea:focus, .input-group input:focus {
+    border-color: var(--primary-color);
+}
+
+#signal-response {
+    margin-top: 15px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}

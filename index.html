@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayank Attri | Detection Engineer & Automation SME</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/secure_uplink.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Rajdhani:wght@500;700&family=Space+Mono&display=swap" rel="stylesheet">
+</head>
+<body class="cyber-theme">
+    <!-- Custom Reactive Cursor -->
+    <div id="cursor-follower"></div>
+    <div id="cursor-main"></div>
+
+    <!-- Background Grid/Particles -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-logo">MAYANK_ATTRI</div>
+        <ul class="nav-links">
+            <li><a href="#home" class="active">HOME</a></li>
+            <li><a href="#projects">PROJECTS</a></li>
+            <li><a href="#experience">EXPERIENCE</a></li>
+            <li><a href="#blog">BLOG</a></li>
+        </ul>
+        <div class="nav-toggle-cli" id="terminal-toggle">[_]</div>
+    </nav>
+
+    <!-- Global CLI Overlay (Initially Hidden) -->
+    <div id="global-terminal" class="hidden">
+        <div class="terminal-header">
+            <span>CONSOLE.LOG [guest@mayank-portfolio:~]</span>
+            <span id="close-terminal">X</span>
+        </div>
+        <div id="terminal-output">
+            <div class="terminal-line dimmed">MayankOS v2.0.0 (Secure Session)</div>
+            <div class="terminal-line">Type 'help' to see available commands.</div>
+        </div>
+        <div class="terminal-input-row">
+            <span class="prompt">></span>
+            <input type="text" id="terminal-input" autocomplete="off" placeholder="type a command...">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="scroll-container">
+        <!-- Section: Home -->
+        <section id="home" class="snap-section">
+            <div class="hero-content">
+                <h2 class="glitch" data-text="DETECTION_ENGINEER_&_AI_SME">DETECTION_ENGINEER_&_AI_SME</h2>
+                <h1 class="decode">SCALING_SECURITY_VIA_AI.init()</h1>
+                <div class="hero-description">
+                    <p>I bridge the gap between offensive exploitation and defensive automation. Currently a <strong>GreyMatter Specialist</strong> at ReliaQuest, where I've reduced alert volume by <strong>80%</strong> through proactive trend analysis and AI-driven tuning.</p>
+                    <p>When I'm not securing enterprise environments, I'm a <strong>HackTheBox Researcher</strong>, breaking into machines and publishing write-ups to help the community level up.</p>
+                </div>
+                <div class="hero-sub-stats">
+                    <span class="stat-item"><span class="highlight">80%</span> ALERT_REDUCTION</span>
+                    <span class="stat-item"><span class="highlight">20+</span> HTB_MACHINES</span>
+                    <span class="stat-item"><span class="highlight">AI_SME</span> DESIGNATION</span>
+                </div>
+                <div class="hero-cta">
+                    <a href="#projects" class="btn-primary">EXPLORE_MODULES</a>
+                    <span class="cta-hint">or use the CLI [ _ ]</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Projects -->
+        <section id="projects" class="snap-section">
+            <div class="section-header">
+                <h3>[ PROJECTS ]</h3>
+                <div class="header-line"></div>
+                <p class="section-intro">Automated intelligence gathering and infrastructure-as-code for detection engineering.</p>
+            </div>
+            <div class="project-grid">
+                <div class="project-card" data-scan="true">
+                    <div class="card-num">01</div>
+                    <h4>Cyber_Intel_Pipeline</h4>
+                    <p>A decoupled Scraping-Normalization-Analysis architecture. Uses Selenium to bypass JS protections and LLMs (Ollama/Gemini) to generate actionable threat digests with strict JSON schema enforcement.</p>
+                    <div class="tech-stack">
+                        <span>Selenium</span> <span>BeautifulSoup</span> <span>Ollama</span> <span>JSONL</span>
+                    </div>
+                </div>
+                <div class="project-card" data-scan="true">
+                    <div class="card-num">02</div>
+                    <h4>Plug-n-Play_Detection_Lab</h4>
+                    <p>Treats the full environment lifecycle as infrastructure-as-code. Orchestrates system updates, Docker installation, and Elastic Stack (ELK) provisioning in one execution, minimizing time-to-first-log.</p>
+                    <div class="tech-stack">
+                        <span>Docker</span> <span>Elasticsearch</span> <span>Kibana</span> <span>WSL2</span>
+                    </div>
+                </div>
+                <div class="project-card" data-scan="true">
+                    <div class="card-num">03</div>
+                    <h4>AI_Automation_Bots</h4>
+                    <p>Developed internal SecEng troubleshooting, QA/QC, and Tuning Agents. Streamlined workflows and accelerated team productivity, leading to selection into the AI SME group.</p>
+                    <div class="tech-stack">
+                        <span>Automation</span> <span>AI/LLM</span> <span>Python</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Experience -->
+        <section id="experience" class="snap-section">
+             <div class="section-header">
+                <h3>[ EXPERIENCE ]</h3>
+                <div class="header-line"></div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="date">FEB 2025 - PRESENT</div>
+                    <div class="role-container">
+                        <div class="role">ReliaQuest | GreyMatter Specialist (AI SME)</div>
+                        <ul>
+                            <li>Reduced alert fatigue by <strong>80%</strong> through proactive trend analysis and pitching 26 ARPs.</li>
+                            <li>Pioneered AI-driven automation for SecEng troubleshooting and Tuning Agents.</li>
+                            <li>Owned Google SecOps log source integration end-to-end.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="date">SEPT 2024 - PRESENT</div>
+                    <div class="role-container">
+                        <div class="role">HackTheBox | CTF Player & Researcher</div>
+                        <ul>
+                            <li>Successfully exploited <strong>20+ machines</strong> showcasing network penetration proficiency.</li>
+                            <li>Published 10+ detailed write-ups aiding the community in advanced techniques.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="date">JULY 2023 - DEC 2023</div>
+                    <div class="role-container">
+                        <div class="role">Insecsys Pvt. Ltd | Cybersecurity Consultant</div>
+                        <ul>
+                            <li>Excelled in client presentations and security audits for 5+ companies.</li>
+                            <li>Delivered tailored advisory on IR and Risk Assessment.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Blog -->
+        <section id="blog" class="snap-section">
+             <div class="section-header">
+                <h3>[ INTEL_FEED ]</h3>
+                <div class="header-line"></div>
+                <p class="section-intro">Automated daily digests: Scraped, Filtered, and Rewritten for Detection Engineers.</p>
+            </div>
+            <div class="blog-preview">
+                <div class="feed-status-bar">
+                    <span class="pulse"></span> FEED_STATUS: ACTIVE | AUTO_REWRITE: ON
+                </div>
+                <div class="blog-list" id="blog-posts">
+                    <!-- Dynamic content loaded from data/feed.json -->
+                    <p class="dimmed">Initializing Uplink to Intelligence Feed...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Secure Channel (Hook) -->
+        <section id="contact" class="snap-section">
+            <div class="secure-channel-container">
+                <h3 class="glitch" data-text="[ SECURE_CHANNEL_ESTABLISHED ]">[ SECURE_CHANNEL_ESTABLISHED ]</h3>
+                <p class="channel-status">Have a detection gap? Deployment failure? <br>Signal capacity limited: <span id="slots" class="highlight">10/10</span> SLOTS REMAINING.</p>
+                
+                <div class="channel-interface">
+                    <div class="input-group">
+                        <label for="signal-message">ENCRYPTED_MESSAGE_BUFFER:</label>
+                        <textarea id="signal-message" placeholder="> Input your directive here..." rows="4"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="signal-contact">RETURN_PATH (Email/Handle):</label>
+                        <input type="text" id="signal-contact" placeholder="> user@domain.tld">
+                    </div>
+                    <button id="send-signal-btn" class="btn-primary">TRANSMIT_SIGNAL</button>
+                    <div id="signal-response"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Uplink Array (Socials) -->
+    <div class="uplink-array" id="uplink-toggle">
+        <div class="uplink-header">
+            <span class="pulse-green"></span> UPLINK_STATUS: ONLINE
+        </div>
+        <div class="uplink-menu hidden" id="uplink-menu">
+            <a href="https://www.linkedin.com/in/mayankattri8180" target="_blank" class="uplink-item">
+                <span class="uplink-label">LINKEDIN</span>
+                <span class="uplink-status">ESTABLISHED</span>
+            </a>
+            <a href="https://github.com/hypocrite0302-jpg" target="_blank" class="uplink-item">
+                <span class="uplink-label">GITHUB</span>
+                <span class="uplink-status">ENCRYPTED</span>
+            </a>
+            <a href="https://x.com/mayankwth" target="_blank" class="uplink-item">
+                <span class="uplink-label">TWITTER_X</span>
+                <span class="uplink-status">BROADCASTING</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/secure_uplink.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[
+    {
+        "title": "LLM-Powered Threat Analysis: A New Frontier",
+        "date": "2026-03-17",
+        "summary": "How we are using local LLMs (Ollama) to parse unstructured log data into actionable threat intelligence. This approach allows for real-time anomaly detection with zero cloud ingress, ensuring data sovereignty.",
+        "url": "#"
+    },
+    {
+        "title": "Bypassing JavaScript Protections with Selenium",
+        "date": "2026-03-15",
+        "summary": "A technical deep dive into simulated human browsing for threat intelligence gathering. We bypass JS obfuscation and fingerprinting techniques by orchestrating headless browsers that mimic user interaction patterns.",
+        "url": "#"
+    },
+    {
+        "title": "Detection Engineering as Code (DEaC)",
+        "date": "2026-03-12",
+        "summary": "Why manual rule creation is dead. Implementing a CI/CD pipeline for Sigma rules, automated testing with Atomic Red Team, and deployment to Elastic SIEM via Terraform.",
+        "url": "#"
+    }
+]
