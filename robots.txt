@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Host: imayank.online
+Sitemap: https://imayank.online/sitemap.xml

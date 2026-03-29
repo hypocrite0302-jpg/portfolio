@@ -1,20 +1,26 @@
 [
-    {
-        "title": "LLM-Powered Threat Analysis: A New Frontier",
-        "date": "2026-03-17",
-        "summary": "How we are using local LLMs (Ollama) to parse unstructured log data into actionable threat intelligence. This approach allows for real-time anomaly detection with zero cloud ingress, ensuring data sovereignty.",
-        "url": "#"
-    },
-    {
-        "title": "Bypassing JavaScript Protections with Selenium",
-        "date": "2026-03-15",
-        "summary": "A technical deep dive into simulated human browsing for threat intelligence gathering. We bypass JS obfuscation and fingerprinting techniques by orchestrating headless browsers that mimic user interaction patterns.",
-        "url": "#"
-    },
-    {
-        "title": "Detection Engineering as Code (DEaC)",
-        "date": "2026-03-12",
-        "summary": "Why manual rule creation is dead. Implementing a CI/CD pipeline for Sigma rules, automated testing with Atomic Red Team, and deployment to Elastic SIEM via Terraform.",
-        "url": "#"
-    }
+  {
+    "title": "How We Reduced SOC Alert Fatigue by 80%",
+    "date": "2026-03-17",
+    "summary": "A practical breakdown of trend-driven tuning loops, analyst feedback signals, and escalation thresholds used to reduce repetitive alert load.",
+    "url": "https://github.com/hypocrite0302-jpg"
+  },
+  {
+    "title": "Bypassing JS Defenses for Threat Intelligence Collection",
+    "date": "2026-03-15",
+    "summary": "Implementation notes on browser automation patterns that preserve scraping reliability against dynamic challenge pages and anti-bot friction.",
+    "url": "https://github.com/hypocrite0302-jpg"
+  },
+  {
+    "title": "Detection Engineering as Code in Daily Operations",
+    "date": "2026-03-12",
+    "summary": "An opinionated model for testing, versioning, and deploying detection logic using IaC-style discipline and measurable validation criteria.",
+    "url": "https://github.com/hypocrite0302-jpg"
+  },
+  {
+    "title": "Designing Internal AI Agents for SecEng Workflows",
+    "date": "2026-03-09",
+    "summary": "Lessons from building internal assistants for triage, QA/QC, and tuning support without sacrificing analyst trust or control.",
+    "url": "https://github.com/hypocrite0302-jpg"
+  }
 ]

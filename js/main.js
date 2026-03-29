@@ -1,226 +1,345 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. Custom Reactive Cursor ---
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+
+    initCursor({ enabled: finePointer && !prefersReducedMotion });
+    initAmbientCanvas({ enabled: !prefersReducedMotion });
+    initNav();
+    initRevealObserver({ reduced: prefersReducedMotion });
+    initTerminal();
+});
+
+function initCursor({ enabled }) {
     const cursorMain = document.getElementById('cursor-main');
     const cursorFollower = document.getElementById('cursor-follower');
-    
-    document.addEventListener('mousemove', (e) => {
-        cursorMain.style.left = e.clientX + 'px';
-        cursorMain.style.top = e.clientY + 'px';
-        
-        setTimeout(() => {
-            cursorFollower.style.left = (e.clientX - 15) + 'px';
-            cursorFollower.style.top = (e.clientY - 15) + 'px';
-        }, 40);
-    });
 
-    const interactiveElements = document.querySelectorAll('a, .btn-primary, #terminal-toggle, .project-card, .nav-links a');
-    interactiveElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursorFollower.style.transform = 'scale(1.5)';
-            cursorFollower.style.background = 'rgba(0, 243, 255, 0.1)';
+    if (!cursorMain || !cursorFollower || !enabled) {
+        if (cursorMain) cursorMain.style.display = 'none';
+        if (cursorFollower) cursorFollower.style.display = 'none';
+        return;
+    }
+
+    let followerX = 0;
+    let followerY = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const move = (event) => {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        cursorMain.style.left = `${mouseX}px`;
+        cursorMain.style.top = `${mouseY}px`;
+    };
+
+    document.addEventListener('mousemove', move);
+
+    const animateFollower = () => {
+        followerX += (mouseX - followerX) * 0.2;
+        followerY += (mouseY - followerY) * 0.2;
+        cursorFollower.style.left = `${followerX}px`;
+        cursorFollower.style.top = `${followerY}px`;
+        requestAnimationFrame(animateFollower);
+    };
+
+    requestAnimationFrame(animateFollower);
+
+    const interactiveSelector = 'a, button, input, textarea, .project-card';
+    document.querySelectorAll(interactiveSelector).forEach((element) => {
+        element.addEventListener('mouseenter', () => {
+            cursorFollower.style.transform = 'translate(-50%, -50%) scale(1.34)';
+            cursorFollower.style.backgroundColor = 'color-mix(in oklab, var(--accent-cyan), transparent 85%)';
         });
-        el.addEventListener('mouseleave', () => {
-            cursorFollower.style.transform = 'scale(1)';
-            cursorFollower.style.background = 'transparent';
+
+        element.addEventListener('mouseleave', () => {
+            cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorFollower.style.backgroundColor = 'transparent';
         });
     });
+}
 
-    // --- 2. Background Canvas (Particles) ---
+function initAmbientCanvas({ enabled }) {
     const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+    if (!canvas || !enabled) {
+        if (canvas) canvas.style.display = 'none';
+        return;
+    }
 
-    function initCanvas() {
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    const particles = [];
+    const maxParticles = window.innerWidth < 900 ? 34 : 56;
+
+    const setSize = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-    }
+    };
 
     class Particle {
         constructor() {
             this.reset();
         }
+
         reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 1.5;
-            this.speedX = Math.random() * 0.5 - 0.25;
-            this.speedY = Math.random() * 0.5 - 0.25;
-            this.opacity = Math.random() * 0.5;
+            this.radius = Math.random() * 1.1 + 0.3;
+            this.velocityX = Math.random() * 0.18 - 0.09;
+            this.velocityY = Math.random() * 0.18 - 0.09;
+            this.alpha = Math.random() * 0.4 + 0.15;
         }
+
         update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x > canvas.width || this.x < 0 || this.y > canvas.height || this.y < 0) {
+            this.x += this.velocityX;
+            this.y += this.velocityY;
+
+            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
                 this.reset();
             }
         }
+
         draw() {
-            ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+            context.beginPath();
+            context.fillStyle = `rgba(151, 236, 255, ${this.alpha})`;
+            context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            context.fill();
         }
     }
 
-    function setupParticles() {
-        particles = [];
-        for (let i = 0; i < 80; i++) {
+    const buildParticles = () => {
+        particles.length = 0;
+        for (let index = 0; index < maxParticles; index += 1) {
             particles.push(new Particle());
         }
-    }
+    };
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
+    const render = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((particle) => {
+            particle.update();
+            particle.draw();
         });
-        requestAnimationFrame(animate);
-    }
+        requestAnimationFrame(render);
+    };
 
-    initCanvas();
-    setupParticles();
-    animate();
+    setSize();
+    buildParticles();
+    requestAnimationFrame(render);
+
+    let resizeTimer;
     window.addEventListener('resize', () => {
-        initCanvas();
-        setupParticles();
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            setSize();
+            buildParticles();
+        }, 120);
+    });
+}
+
+function initNav() {
+    const nav = document.querySelector('.glass-nav');
+    const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+    const navLinksContainer = document.getElementById('nav-links');
+    const mobileToggle = document.getElementById('mobile-nav-toggle');
+
+    if (!nav || !navLinksContainer || !mobileToggle) return;
+
+    mobileToggle.addEventListener('click', () => {
+        const expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+        mobileToggle.setAttribute('aria-expanded', String(!expanded));
+        navLinksContainer.classList.toggle('open');
     });
 
-    // --- 3. Scroll Handling & Nav ---
-    const scrollContainer = document.getElementById('scroll-container');
-    const sections = document.querySelectorAll('.snap-section');
-    const navLinks = document.querySelectorAll('.nav-links a');
-
-    scrollContainer.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (scrollContainer.scrollTop >= sectionTop - 150) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href').substring(1) === current) {
-                link.classList.add('active');
-            }
+    navLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+            mobileToggle.setAttribute('aria-expanded', 'false');
+            navLinksContainer.classList.remove('open');
         });
     });
 
-    // --- 4. Global Terminal Interaction ---
+    const sectionTargets = navLinks
+        .map((link) => document.querySelector(link.getAttribute('href')))
+        .filter(Boolean);
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                const activeId = entry.target.id;
+                navLinks.forEach((link) => {
+                    const isActive = link.getAttribute('href') === `#${activeId}`;
+                    link.classList.toggle('active', isActive);
+                });
+            });
+        },
+        {
+            threshold: 0.45,
+            rootMargin: '-15% 0px -30% 0px'
+        }
+    );
+
+    sectionTargets.forEach((section) => observer.observe(section));
+}
+
+function initRevealObserver({ reduced }) {
+    const revealItems = document.querySelectorAll('.reveal');
+    if (!revealItems.length) return;
+
+    revealItems.forEach((item) => {
+        const delay = Number(item.dataset.revealDelay || 0);
+        if (delay) {
+            item.style.setProperty('--reveal-delay', `${Math.round(delay * 1000)}ms`);
+        }
+    });
+
+    if (reduced) {
+        revealItems.forEach((item) => item.classList.add('is-visible'));
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        (entries, internalObserver) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                internalObserver.unobserve(entry.target);
+            });
+        },
+        {
+            threshold: 0.12,
+            rootMargin: '0px 0px -12% 0px'
+        }
+    );
+
+    revealItems.forEach((item) => observer.observe(item));
+}
+
+function initTerminal() {
     const terminal = document.getElementById('global-terminal');
     const terminalToggle = document.getElementById('terminal-toggle');
     const closeTerminal = document.getElementById('close-terminal');
     const terminalInput = document.getElementById('terminal-input');
     const terminalOutput = document.getElementById('terminal-output');
 
+    if (!terminal || !terminalToggle || !closeTerminal || !terminalInput || !terminalOutput) {
+        return;
+    }
+
+    const openTerminal = () => {
+        terminal.classList.remove('hidden');
+        terminalToggle.setAttribute('aria-expanded', 'true');
+        terminalInput.focus();
+    };
+
+    const closeTerminalPanel = () => {
+        terminal.classList.add('hidden');
+        terminalToggle.setAttribute('aria-expanded', 'false');
+    };
+
     terminalToggle.addEventListener('click', () => {
-        terminal.classList.toggle('hidden');
-        if (!terminal.classList.contains('hidden')) {
-            terminalInput.focus();
+        const isHidden = terminal.classList.contains('hidden');
+        if (isHidden) {
+            openTerminal();
+        } else {
+            closeTerminalPanel();
         }
     });
 
-    closeTerminal.addEventListener('click', () => {
-        terminal.classList.add('hidden');
-    });
+    closeTerminal.addEventListener('click', closeTerminalPanel);
 
-    terminalInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const cmd = terminalInput.value.toLowerCase().trim();
-            if (cmd) {
-                handleCommand(cmd);
-                terminalInput.value = '';
-            }
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeTerminalPanel();
         }
     });
 
     const commands = {
-        help: () => `
-            Available Commands:<br>
-            - <span class="highlight">whois</span>: Profile summary<br>
-            - <span class="highlight">ls</span>: List site sections<br>
-            - <span class="highlight">cd [section]</span>: Navigate to section (home, projects, experience, blog)<br>
-            - <span class="highlight">projects</span>: View detailed project list<br>
-            - <span class="highlight">experience</span>: View career timeline<br>
-            - <span class="highlight">blog</span>: Show latest intel feed<br>
-            - <span class="highlight">clear</span>: Clear terminal buffer<br>
-        `,
-        whois: () => `
-            User: <span class="highlight">Mayank Attri</span><br>
-            Role: Detection Engineer & AI SME<br>
-            Impact: 80% Alert Reduction at ReliaQuest<br>
-            Status: Active | HackTheBox Researcher<br>
-        `,
-        ls: () => `
-            drwxr-xr-x  home/<br>
-            drwxr-xr-x  projects/<br>
-            drwxr-xr-x  experience/<br>
-            drwxr-xr-x  blog/
-        `,
-        projects: () => `
-            1. <span class="highlight">Cyber_Intel_Pipeline</span>: Selenium + LLM based threat intel.<br>
-            2. <span class="highlight">Plug-n-Play_Lab</span>: IaC for Elastic Stack.<br>
-            3. <span class="highlight">AI_Automation_Bots</span>: SecEng efficiency tools.<br>
-        `,
-        experience: () => `
-            - <span class="highlight">ReliaQuest</span> (2025-Pres): GreyMatter Specialist.<br>
-            - <span class="highlight">HackTheBox</span> (2024-Pres): CTF Researcher.<br>
-            - <span class="highlight">Insecsys</span> (2023): Cybersecurity Consultant.<br>
-        `,
-        blog: () => `
-            Latest Intel:<br>
-            - LLM-Powered Threat Analysis (2026-03-17)<br>
-            - Bypassing JS Protections (2026-03-15)<br>
-        `,
+        help: () => [
+            "Available commands:",
+            "- help: list commands",
+            "- whois: profile summary",
+            "- projects: project quick view",
+            "- experience: recent roles",
+            "- contact: contact options",
+            "- domain: live domain details",
+            "- cd [section]: jump to section",
+            "- clear: clear terminal"
+        ].join('<br>'),
+        whois: () => [
+            "Mayank Attri",
+            "Detection Engineer | AI Automation Specialist",
+            "Current focus: SOC-scale detection operations"
+        ].join('<br>'),
+        projects: () => [
+            "1) Cyber Intel Pipeline",
+            "2) Plug-and-Play Detection Lab",
+            "3) AI Security Agents"
+        ].join('<br>'),
+        experience: () => [
+            "ReliaQuest (2025-Present)",
+            "Hack The Box (2024-Present)",
+            "Insecsys (2023)"
+        ].join('<br>'),
+        contact: () => [
+            "Use the Secure Contact section below.",
+            "Or connect via LinkedIn/GitHub from Uplink panel."
+        ].join('<br>'),
+        domain: () => [
+            "Primary domain: https://imayank.online",
+            "Canonical configured for root portfolio URL."
+        ].join('<br>'),
         clear: () => {
             terminalOutput.innerHTML = '';
             return null;
         }
     };
 
-    function handleCommand(input) {
-        const [cmd, arg] = input.split(' ');
-        
-        // Echo input
-        const echo = document.createElement('div');
-        echo.className = 'terminal-line';
-        echo.innerHTML = `<span class="prompt">></span> ${input}`;
-        terminalOutput.appendChild(echo);
+    terminalInput.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') return;
 
-        let result = '';
+        const rawInput = terminalInput.value.trim();
+        if (!rawInput) return;
 
-        if (cmd === 'cd' && arg) {
-            const target = document.getElementById(arg);
+        appendLine(terminalOutput, `<span class="prompt">$</span> ${escapeHtml(rawInput)}`);
+
+        const [rawCommand, ...rest] = rawInput.toLowerCase().split(' ');
+        const argument = rest.join(' ').trim();
+
+        let response = '';
+
+        if (rawCommand === 'cd' && argument) {
+            const target = document.getElementById(argument);
             if (target) {
-                // Determine which container to scroll
-                const container = window.innerWidth <= 768 ? window : scrollContainer;
-                const scrollTarget = window.innerWidth <= 768 ? target.offsetTop : target.offsetTop;
-                
-                if (window.innerWidth <= 768) {
-                    window.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-                } else {
-                    scrollContainer.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-                }
-                result = `<span class="success">Navigating to ${arg}...</span>`;
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                response = `<span class="success">navigating to #${escapeHtml(argument)}</span>`;
             } else {
-                result = `<span class="error">Directory not found: ${arg}</span>`;
+                response = `<span class="error">unknown section: ${escapeHtml(argument)}</span>`;
             }
-        } else if (commands[cmd]) {
-            const output = commands[cmd]();
-            if (output !== null) result = output;
+        } else if (commands[rawCommand]) {
+            response = commands[rawCommand]();
         } else {
-            result = `<span class="error">Command not found: ${cmd}</span>. Type 'help' for list.`;
+            response = `<span class="error">command not found: ${escapeHtml(rawCommand)}</span> <span class="dimmed">(type help)</span>`;
         }
 
-        if (result) {
-            const response = document.createElement('div');
-            response.className = 'terminal-line';
-            response.innerHTML = result;
-            terminalOutput.appendChild(response);
-        }
+        if (response) appendLine(terminalOutput, response);
 
+        terminalInput.value = '';
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
-    }
-});
+    });
+}
+
+function appendLine(container, html) {
+    const node = document.createElement('div');
+    node.className = 'terminal-line';
+    node.innerHTML = html;
+    container.appendChild(node);
+}
+
+function escapeHtml(value) {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}

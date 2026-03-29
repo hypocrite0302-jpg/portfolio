@@ -1,108 +1,220 @@
-// Append this to existing main.js logic
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 5. Uplink Array (Socials) ---
-    const uplinkHeader = document.querySelector('.uplink-header');
-    const uplinkMenu = document.getElementById('uplink-menu');
-    
-    if(uplinkHeader) {
-        uplinkHeader.addEventListener('click', () => {
-            uplinkMenu.classList.toggle('hidden');
+    initUplinkToggle();
+    loadBlogFeed();
+    initSignalForm();
+});
+
+function initUplinkToggle() {
+    const uplinkRoot = document.getElementById('uplink-toggle');
+    if (!uplinkRoot) return;
+
+    const header = uplinkRoot.querySelector('.uplink-header');
+    const menu = document.getElementById('uplink-menu');
+    if (!header || !menu) return;
+
+    const setState = (expanded) => {
+        header.setAttribute('aria-expanded', String(expanded));
+        menu.classList.toggle('hidden', !expanded);
+    };
+
+    setState(false);
+
+    header.addEventListener('click', () => {
+        const expanded = header.getAttribute('aria-expanded') === 'true';
+        setState(!expanded);
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!uplinkRoot.contains(event.target)) {
+            setState(false);
+        }
+    });
+}
+
+async function loadBlogFeed() {
+    const list = document.getElementById('blog-posts');
+    if (!list) return;
+
+    const renderMessage = (message, className = 'dimmed') => {
+        list.innerHTML = '';
+        const p = document.createElement('p');
+        p.className = className;
+        p.textContent = message;
+        list.appendChild(p);
+    };
+
+    try {
+        const response = await fetch('data/feed.json', { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Feed request failed with status ${response.status}`);
+        }
+
+        const payload = await response.json();
+        if (!Array.isArray(payload) || payload.length === 0) {
+            renderMessage('No intel entries are published yet. Check back soon.');
+            return;
+        }
+
+        list.innerHTML = '';
+
+        payload.slice(0, 4).forEach((item) => {
+            const article = document.createElement('article');
+            article.className = 'blog-card';
+
+            const dateNode = document.createElement('p');
+            dateNode.className = 'blog-date';
+            dateNode.textContent = formatDate(item.date);
+
+            const titleNode = document.createElement('h3');
+            titleNode.textContent = safeText(item.title, 'Untitled intel update');
+
+            const summaryNode = document.createElement('p');
+            summaryNode.textContent = safeText(item.summary, 'Summary unavailable for this entry.');
+
+            const linkNode = document.createElement('a');
+            linkNode.className = 'read-more';
+            linkNode.textContent = 'Read Full Report';
+            linkNode.href = safeUrl(item.url);
+
+            if (linkNode.href.startsWith('http')) {
+                linkNode.target = '_blank';
+                linkNode.rel = 'noopener noreferrer';
+            }
+
+            article.append(dateNode, titleNode, summaryNode, linkNode);
+            list.appendChild(article);
         });
+    } catch (_error) {
+        renderMessage('Secure feed is temporarily unavailable. Please refresh shortly.', 'error');
     }
+}
 
-    // --- 6. Blog Feed Loader ---
-    const blogList = document.getElementById('blog-posts');
-    if (blogList) {
-        fetch('data/feed.json')
-            .then(response => response.json())
-            .then(data => {
-                blogList.innerHTML = ''; // Clear placeholder
-                data.slice(0, 3).forEach(post => {
-                    const article = document.createElement('article');
-                    article.className = 'blog-card';
-                    article.innerHTML = `
-                        <div class="blog-date">${post.date}</div>
-                        <h5>${post.title}</h5>
-                        <p>${post.summary}</p>
-                        <a href="${post.url}" class="read-more">READ_FULL_REPORT ></a>
-                    `;
-                    blogList.appendChild(article);
-                });
-            })
-            .catch(err => {
-                console.error('Failed to load feed:', err);
-                blogList.innerHTML = '<p class="error">Secure Feed Offline.</p>';
-            });
-    }
-
-    // --- 7. Secure Channel (Discord Hook) ---
-    const sendBtn = document.getElementById('send-signal-btn');
-    const msgInput = document.getElementById('signal-message');
+function initSignalForm() {
+    const form = document.getElementById('signal-form');
+    const messageInput = document.getElementById('signal-message');
     const contactInput = document.getElementById('signal-contact');
-    const responseDiv = document.getElementById('signal-response');
-    const slotsDisplay = document.getElementById('slots');
+    const responseNode = document.getElementById('signal-response');
+    const slotsNode = document.getElementById('slots');
 
-    // Load available slots (Mock persistence)
-    let slots = parseInt(localStorage.getItem('signal_slots') || '10');
-    if(slotsDisplay) slotsDisplay.innerText = `${slots}/10`;
+    if (!form || !messageInput || !contactInput || !responseNode || !slotsNode) {
+        return;
+    }
 
-    if(sendBtn) {
-        sendBtn.addEventListener('click', async () => {
-            const message = msgInput.value.trim();
-            const contact = contactInput.value.trim();
+    let slots = clampSlots(localStorage.getItem('signal_slots'));
+    updateSlotsUI(slotsNode, slots);
 
-            if (!message || !contact) {
-                responseDiv.innerHTML = '<span class="error">ERROR: EMPTY_BUFFER. Please provide message and return path.</span>';
-                return;
-            }
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            if (slots <= 0) {
-                responseDiv.innerHTML = '<span class="error">ERROR: CAPACITY_REACHED. Try again later.</span>';
-                return;
-            }
+        responseNode.className = '';
 
-            // --- DISCORD WEBHOOK LOGIC ---
-            // Replace with your actual Webhook URL
-            const WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1483488749970260139/QUj7-xsJpBhBXpCwxx-noz9xwmcUW25Q2Xs1YDkHPShqUAK23XzCAAVflfP-vTUTLE8B'; 
-            
+        const message = messageInput.value.trim();
+        const contact = contactInput.value.trim();
+
+        if (!message || !contact) {
+            setResponse(responseNode, 'Please provide both challenge summary and return channel.', true);
+            return;
+        }
+
+        if (slots <= 0) {
+            setResponse(responseNode, 'Current contact capacity is full. Please try again later.', true);
+            return;
+        }
+
+        const submitButton = form.querySelector('#send-signal-btn');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Transmitting...';
+        }
+
+        try {
+            const endpoint = (window.PORTFOLIO_SIGNAL_ENDPOINT || '').trim();
             const payload = {
-                content: `**[SECURE CHANNEL SIGNAL]**\n**From:** ${contact}\n**Message:** ${message}`
+                message,
+                contact,
+                source: 'imayank.online portfolio',
+                timestamp: new Date().toISOString()
             };
 
-            sendBtn.innerText = 'TRANSMITTING...';
-            sendBtn.disabled = true;
-
-            try {
-                // Check if user actually replaced the placeholder
-                if(WEBHOOK_URL.includes('YOUR_DISCORD_WEBHOOK_URL')) {
-                    throw new Error("Webhook not configured.");
-                }
-
-                const response = await fetch(WEBHOOK_URL, {
+            if (endpoint) {
+                const request = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if (response.ok) {
-                    slots--;
-                    localStorage.setItem('signal_slots', slots);
-                    if(slotsDisplay) slotsDisplay.innerText = `${slots}/10`;
-                    
-                    responseDiv.innerHTML = '<span class="success">SIGNAL_ACKNOWLEDGED. Encryption Key Exchanged.</span>';
-                    msgInput.value = '';
-                    contactInput.value = '';
-                } else {
-                    throw new Error('Transmission rejected.');
+                if (!request.ok) {
+                    throw new Error(`Signal endpoint rejected request (${request.status})`);
                 }
-            } catch (error) {
-                console.error(error);
-                // Fallback for demo purposes if webhook isn't set
-                responseDiv.innerHTML = '<span class="error">TRANSMISSION_FAILURE: Network unreachable (Check Webhook Config).</span>';
-            } finally {
-                sendBtn.innerText = 'TRANSMIT_SIGNAL';
-                sendBtn.disabled = false;
+            } else {
+                const subject = encodeURIComponent('Portfolio inquiry from imayank.online');
+                const body = encodeURIComponent(`Contact: ${contact}\n\nChallenge:\n${message}`);
+                window.location.href = `mailto:mayank@imayank.online?subject=${subject}&body=${body}`;
             }
-        });
+
+            slots = Math.max(0, slots - 1);
+            localStorage.setItem('signal_slots', String(slots));
+            updateSlotsUI(slotsNode, slots);
+
+            messageInput.value = '';
+            contactInput.value = '';
+            setResponse(responseNode, 'Signal acknowledged. You can expect a response shortly.', false);
+        } catch (_error) {
+            setResponse(responseNode, 'Transmission failed. Please retry or connect via LinkedIn from Uplink.', true);
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Transmit Signal';
+            }
+        }
+    });
+}
+
+function clampSlots(value) {
+    const numericValue = Number.parseInt(value || '10', 10);
+    if (Number.isNaN(numericValue)) return 10;
+    return Math.min(10, Math.max(0, numericValue));
+}
+
+function updateSlotsUI(node, slots) {
+    node.textContent = `${slots}/10`;
+}
+
+function setResponse(node, message, isError) {
+    node.textContent = message;
+    node.classList.add(isError ? 'error' : 'success');
+}
+
+function safeText(value, fallback) {
+    if (typeof value !== 'string') return fallback;
+    const text = value.trim();
+    return text || fallback;
+}
+
+function safeUrl(value) {
+    if (typeof value !== 'string') return '#';
+    const candidate = value.trim();
+    if (!candidate) return '#';
+
+    if (candidate.startsWith('#')) return candidate;
+
+    try {
+        const parsed = new URL(candidate, window.location.origin);
+        return parsed.toString();
+    } catch (_error) {
+        return '#';
     }
-});
+}
+
+function formatDate(value) {
+    if (typeof value !== 'string') return 'Date unavailable';
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return 'Date unavailable';
+
+    return parsed.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
