@@ -260,6 +260,7 @@ function initTerminal() {
             "- whois: profile summary",
             "- projects: project quick view",
             "- experience: recent roles",
+            "- credentials: education and certifications",
             "- contact: contact options",
             "- domain: live domain details",
             "- cd [section]: jump to section",
@@ -267,18 +268,23 @@ function initTerminal() {
         ].join('<br>'),
         whois: () => [
             "Mayank Attri",
-            "Detection Engineer | AI Automation Specialist",
-            "Current focus: SOC-scale detection operations"
+            "GreyMatter Specialist | AI-SOC Operations | Security Automation",
+            "Current focus: triage, tuning, SecEng troubleshooting, and AI workflow automation"
         ].join('<br>'),
         projects: () => [
             "1) Cyber Intel Pipeline",
             "2) Plug-and-Play Detection Lab",
-            "3) AI Security Agents"
+            "3) AI Workflow Automation Suite",
+            "4) Google SecOps Integration Ownership"
         ].join('<br>'),
         experience: () => [
-            "ReliaQuest (2025-Present)",
+            "ReliaQuest (2025-Present) | GreyMatter Specialist (AI SME)",
             "Hack The Box (2024-Present)",
             "Insecsys (2023)"
+        ].join('<br>'),
+        credentials: () => [
+            "B.E. Electronics and Telecommunications | GPA 8.2",
+            "CEHv12 Certified Ethical Hacker (Aug 2024)"
         ].join('<br>'),
         contact: () => [
             "Use the Secure Contact section below.",

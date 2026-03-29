@@ -457,6 +457,14 @@ main {
         box-shadow var(--duration-base) var(--ease-out-expo);
 }
 
+.project-card-half {
+    grid-column: span 6;
+}
+
+.project-card-full {
+    grid-column: 1 / -1;
+}
+
 .project-card::after {
     content: "";
     position: absolute;
