@@ -821,29 +821,21 @@ main {
     border-color: currentcolor;
 }
 
+.terminal-stage {
+    margin-top: var(--space-4);
+}
+
 #global-terminal {
-    position: fixed;
-    right: var(--space-3);
-    bottom: var(--space-3);
-    width: min(33rem, calc(100% - 2 * var(--space-3)));
-    height: min(28rem, 72vh);
+    width: 100%;
+    height: clamp(28rem, 72vh, 44rem);
     border-radius: var(--radius-md);
     border: 1px solid color-mix(in oklab, var(--accent-cyan), transparent 60%);
     background: color-mix(in oklab, var(--bg-0), transparent 5%);
     box-shadow: 0 1rem 2.5rem oklch(0.05 0.02 255 / 0.8);
     backdrop-filter: blur(12px);
-    z-index: 2000;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     overflow: hidden;
-    transform-origin: bottom right;
-    transition: transform var(--duration-slow) var(--ease-out-expo), opacity var(--duration-base) ease;
-}
-
-#global-terminal.hidden {
-    transform: translateY(2.2rem) scale(0.94);
-    opacity: 0;
-    pointer-events: none;
 }
 
 .terminal-header {
@@ -859,7 +851,13 @@ main {
     color: var(--accent-cyan);
 }
 
-#close-terminal {
+.terminal-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terminal-actions button {
     border: 1px solid var(--line-soft);
     border-radius: 0.38rem;
     background: transparent;
@@ -869,10 +867,22 @@ main {
     cursor: pointer;
 }
 
-#close-terminal:hover,
-#close-terminal:focus-visible {
+.terminal-actions button:hover,
+.terminal-actions button:focus-visible {
     border-color: var(--line-strong);
     color: var(--text-1);
+}
+
+.terminal-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.7fr);
+    min-height: 0;
+}
+
+.terminal-main {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: 0;
 }
 
 #terminal-output {
@@ -918,6 +928,66 @@ main {
     color: var(--text-1);
     font-family: var(--font-mono);
     font-size: 0.84rem;
+}
+
+.terminal-sidebar {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: 1rem;
+    border-left: 1px solid color-mix(in oklab, var(--line-soft), transparent 10%);
+    background: color-mix(in oklab, var(--surface-2), transparent 18%);
+}
+
+.terminal-sidebar-title {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+}
+
+.terminal-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.terminal-chip {
+    border: 1px solid color-mix(in oklab, var(--accent-cyan), transparent 75%);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--accent-cyan), transparent 92%);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 0.38rem 0.7rem;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.terminal-chip:hover,
+.terminal-chip:focus-visible {
+    transform: translateY(-1px);
+    border-color: var(--line-strong);
+}
+
+.terminal-sidebar-copy {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.92rem;
+}
+
+#global-terminal:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    border-radius: 0;
+    border: 0;
+}
+
+#global-terminal:fullscreen .terminal-body {
+    height: 100%;
 }
 
 .visually-hidden {
@@ -1017,6 +1087,15 @@ main {
     .project-card {
         grid-column: 1 / -1;
     }
+
+    .terminal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .terminal-sidebar {
+        border-left: 0;
+        border-top: 1px solid color-mix(in oklab, var(--line-soft), transparent 10%);
+    }
 }
 
 @media (max-width: 38rem) {
@@ -1025,10 +1104,7 @@ main {
     }
 
     #global-terminal {
-        width: calc(100% - 1.2rem);
-        right: 0.6rem;
-        left: 0.6rem;
-        bottom: 0.6rem;
+        height: min(40rem, 78vh);
     }
 }
 

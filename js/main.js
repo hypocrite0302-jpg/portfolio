@@ -217,41 +217,60 @@ function initRevealObserver({ reduced }) {
 function initTerminal() {
     const terminal = document.getElementById('global-terminal');
     const terminalToggle = document.getElementById('terminal-toggle');
-    const closeTerminal = document.getElementById('close-terminal');
+    const focusTerminalButton = document.getElementById('focus-terminal');
+    const fullscreenButton = document.getElementById('toggle-terminal-fullscreen');
     const terminalInput = document.getElementById('terminal-input');
     const terminalOutput = document.getElementById('terminal-output');
+    const terminalCommandChips = document.querySelectorAll('.terminal-chip');
 
-    if (!terminal || !terminalToggle || !closeTerminal || !terminalInput || !terminalOutput) {
+    if (!terminal || !terminalToggle || !terminalInput || !terminalOutput) {
         return;
     }
 
-    const openTerminal = () => {
-        terminal.classList.remove('hidden');
-        terminalToggle.setAttribute('aria-expanded', 'true');
-        terminalInput.focus();
+    const focusTerminal = () => {
+        terminal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.setTimeout(() => {
+            terminalInput.focus();
+        }, 180);
     };
 
-    const closeTerminalPanel = () => {
-        terminal.classList.add('hidden');
-        terminalToggle.setAttribute('aria-expanded', 'false');
+    const updateFullscreenButton = () => {
+        if (!fullscreenButton) return;
+        const isFullscreen = document.fullscreenElement === terminal;
+        fullscreenButton.textContent = isFullscreen ? 'Exit Full Screen' : 'Full Screen';
+        fullscreenButton.setAttribute('aria-label', isFullscreen ? 'Exit terminal fullscreen' : 'Enter terminal fullscreen');
     };
 
-    terminalToggle.addEventListener('click', () => {
-        const isHidden = terminal.classList.contains('hidden');
-        if (isHidden) {
-            openTerminal();
-        } else {
-            closeTerminalPanel();
-        }
-    });
-
-    closeTerminal.addEventListener('click', closeTerminalPanel);
+    terminalToggle.addEventListener('click', focusTerminal);
+    if (focusTerminalButton) focusTerminalButton.addEventListener('click', focusTerminal);
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeTerminalPanel();
+        if (event.key === 'Escape' && document.fullscreenElement === terminal) {
+            document.exitFullscreen().catch(() => {});
         }
     });
+
+    if (fullscreenButton) {
+        fullscreenButton.addEventListener('click', async () => {
+            try {
+                if (document.fullscreenElement === terminal) {
+                    await document.exitFullscreen();
+                } else {
+                    await terminal.requestFullscreen();
+                }
+            } catch (_error) {
+                appendLine(
+                    terminalOutput,
+                    '<span class="error">fullscreen unavailable in this browser context</span>'
+                );
+            } finally {
+                updateFullscreenButton();
+            }
+        });
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    updateFullscreenButton();
 
     const commands = {
         help: () => [
@@ -261,6 +280,7 @@ function initTerminal() {
             "- projects: project quick view",
             "- experience: recent roles",
             "- credentials: education and certifications",
+            "- insights: blog and feed summary",
             "- contact: contact options",
             "- domain: live domain details",
             "- cd [section]: jump to section",
@@ -286,6 +306,10 @@ function initTerminal() {
             "B.E. Electronics and Telecommunications | GPA 8.2",
             "CEHv12 Certified Ethical Hacker (Aug 2024)"
         ].join('<br>'),
+        insights: () => [
+            "Intel feed: tactical write-ups and analyst-ready summaries.",
+            "Use cd insights to jump to the feed section."
+        ].join('<br>'),
         contact: () => [
             "Use the Secure Contact section below.",
             "Or connect via LinkedIn/GitHub from Uplink panel."
@@ -300,10 +324,7 @@ function initTerminal() {
         }
     };
 
-    terminalInput.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter') return;
-
-        const rawInput = terminalInput.value.trim();
+    const runCommand = (rawInput) => {
         if (!rawInput) return;
 
         appendLine(terminalOutput, `<span class="prompt">$</span> ${escapeHtml(rawInput)}`);
@@ -329,8 +350,26 @@ function initTerminal() {
 
         if (response) appendLine(terminalOutput, response);
 
-        terminalInput.value = '';
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    };
+
+    terminalInput.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') return;
+
+        const rawInput = terminalInput.value.trim();
+        runCommand(rawInput);
+        terminalInput.value = '';
+    });
+
+    terminalCommandChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+            const command = chip.getAttribute('data-command');
+            if (!command) return;
+            terminalInput.value = command;
+            runCommand(command);
+            terminalInput.value = '';
+            terminalInput.focus();
+        });
     });
 }
 
