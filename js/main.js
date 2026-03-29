@@ -235,8 +235,10 @@ function initTerminal() {
     };
 
     const updateFullscreenButton = () => {
-        if (!fullscreenButton) return;
         const isFullscreen = document.fullscreenElement === terminal;
+        document.body.classList.toggle('terminal-fullscreen-active', isFullscreen);
+
+        if (!fullscreenButton) return;
         fullscreenButton.textContent = isFullscreen ? 'Exit Full Screen' : 'Full Screen';
         fullscreenButton.setAttribute('aria-label', isFullscreen ? 'Exit terminal fullscreen' : 'Enter terminal fullscreen');
     };

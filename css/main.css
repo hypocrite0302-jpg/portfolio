@@ -64,6 +64,10 @@ body {
     cursor: none;
 }
 
+body.terminal-fullscreen-active {
+    cursor: auto;
+}
+
 @media (pointer: coarse), (max-width: 1024px) {
     body {
         cursor: auto;
@@ -984,10 +988,21 @@ main {
     max-width: none;
     border-radius: 0;
     border: 0;
+    cursor: auto;
 }
 
 #global-terminal:fullscreen .terminal-body {
     height: 100%;
+}
+
+#global-terminal:fullscreen,
+#global-terminal:fullscreen * {
+    cursor: auto !important;
+}
+
+body.terminal-fullscreen-active #cursor-main,
+body.terminal-fullscreen-active #cursor-follower {
+    display: none !important;
 }
 
 .visually-hidden {
