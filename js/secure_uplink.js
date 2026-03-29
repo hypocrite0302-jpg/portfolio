@@ -137,6 +137,10 @@ function initSignalForm() {
             };
 
             if (endpoint) {
+                if (!isSafeSignalEndpoint(endpoint)) {
+                    throw new Error('Unsafe endpoint configuration detected.');
+                }
+
                 const request = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -203,6 +207,28 @@ function safeUrl(value) {
         return parsed.toString();
     } catch (_error) {
         return '#';
+    }
+}
+
+function isSafeSignalEndpoint(value) {
+    try {
+        const url = new URL(value, window.location.origin);
+
+        if (url.protocol !== 'https:') return false;
+
+        const blockedHosts = ['discord.com', 'discordapp.com', 'hooks.slack.com'];
+        const isBlockedHost = blockedHosts.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`));
+        if (isBlockedHost) return false;
+
+        const normalizedPath = url.pathname.toLowerCase();
+        const looksLikeWebhookPath =
+            normalizedPath.includes('/api/webhooks/') ||
+            normalizedPath.includes('/services/');
+        if (looksLikeWebhookPath) return false;
+
+        return true;
+    } catch (_error) {
+        return false;
     }
 }
 

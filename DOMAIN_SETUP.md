@@ -51,8 +51,11 @@ In GitHub account settings:
 
 Keep that TXT record in DNS after verification.
 
-## 5) Contact form backend (optional)
-If you want live form delivery instead of email fallback, set:
+## 5) Contact form backend (security-first)
+Do not put Discord/Slack webhook URLs in frontend JavaScript.
+Keep webhook secrets only in a backend or serverless proxy.
+
+If you want live form delivery instead of email fallback, set a secure API endpoint:
 
 ```html
 <script>
@@ -61,3 +64,5 @@ If you want live form delivery instead of email fallback, set:
 ```
 
 Without this, the form opens an email draft to `mayank@imayank.online`.
+
+The frontend now rejects known direct webhook endpoints (for example `discord.com/api/webhooks/...`) to reduce accidental secret exposure.
