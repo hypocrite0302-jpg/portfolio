@@ -267,13 +267,13 @@ function initTerminal() {
         ].join('<br>'),
         whois: () => [
             "Mayank Attri",
-            "AI-SOC Specialist | Detection Engineering | Security Automation",
-            "Current focus: triage quality, rule tuning, SecEng troubleshooting, and AI workflows"
+            "Detection Engineer | AI Automation Specialist",
+            "Current focus: SOC-scale detection operations"
         ].join('<br>'),
         projects: () => [
-            "1) SOC Triage and Incident Operations",
-            "2) Detection Logic and Rule Fine-Tuning",
-            "3) Security Engineering + AI Workflow Automation"
+            "1) Cyber Intel Pipeline",
+            "2) Plug-and-Play Detection Lab",
+            "3) AI Security Agents"
         ].join('<br>'),
         experience: () => [
             "ReliaQuest (2025-Present)",
